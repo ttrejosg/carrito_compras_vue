@@ -1,0 +1,240 @@
+<script setup>
+import IconPlus from "./icons/IconPlus.vue";
+import IconMinus from "./icons/IconMinus.vue";
+import IconTrash from "./icons/IconTrash.vue";
+import IconClose from "./icons/IconClose.vue";
+import { ref, computed } from "vue";
+
+const products = ref(JSON.parse(localStorage.getItem("cart")) || []);
+
+const total = computed(() => {
+  let total = 0;
+  products.value.forEach((dish) => {
+    total += dish.price * dish.amount;
+  });
+  return total;
+});
+
+const totalAmount = computed(() => {
+  let totalAmount = 0;
+  products.value.forEach((dish) => {
+    totalAmount += dish.amount;
+  });
+  return totalAmount;
+});
+
+const addPr = (index) => {
+  products.value[index].amount++;
+  updateProducts();
+};
+
+const subtractPr = (index) => {
+  console.log(index);
+  if (products.value[index].amount > 1) {
+    products.value[index].amount--;
+  }
+  updateProducts();
+};
+
+const deletePr = (index) => {
+  products.value.splice(index, 1);
+  updateProducts();
+};
+
+const updateProducts = () => {
+  localStorage.setItem("cart", JSON.stringify(products.value));
+};
+
+const emit = defineEmits(["closeModalEmit", "buyEmit"]);
+</script>
+
+<template>
+  <section class="modal">
+    <section class="product-list">
+      <IconClose class="close" @click="emit('closeModalEmit')" />
+      <h2>Products</h2>
+      <hr />
+      <table v-if="products.length > 0">
+        <tbody>
+          <tr v-for="(dish, index) in products" :key="index">
+            <td>
+              <img src="../assets/image.png" alt="Product" width="130" />
+            </td>
+            <td>{{ dish.name }}</td>
+            <td>EXP: {{ dish.expiration }}</td>
+            <td class="amount">
+              <IconMinus @click="subtractPr(index)" />
+              <span> {{ dish.amount }} </span>
+              <IconPlus @click="addPr(index)" />
+            </td>
+            <td>$ {{ dish.price }}</td>
+            <td>
+              <IconTrash class="trash" @click="deletePr(index)" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="empty-list" v-else-if="products.length == 0">
+        <h1>Products list 📋</h1>
+      </div>
+    </section>
+    <section class="summary">
+      <h2>Purchase Summary</h2>
+      <hr />
+      <div class="summary-list">
+        <div>
+          <h3>Products</h3>
+          <span>{{ totalAmount }}</span>
+        </div>
+        <div>
+          <h3>Total</h3>
+          <span>$ {{ total }}</span>
+        </div>
+      </div>
+      <button @click="emit('buyEmit')">Buy Products</button>
+    </section>
+  </section>
+</template>
+
+<style scoped>
+.modal {
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
+  backdrop-filter: blur(10px);
+  gap: 5rem;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+hr {
+  border: 1px solid var(--blue);
+}
+
+.product-list {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+tbody tr {
+  border-bottom: 2px solid var(--blue);
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.amount {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 0.2rem 0.6rem;
+  border-radius: 5px;
+  svg {
+    cursor: pointer;
+    color: var(--blue-dark);
+    transition: 0.2s;
+  }
+}
+
+.amount svg:hover {
+  transform: scale(1.1);
+}
+
+td {
+  display: flex;
+  margin: 0.8rem 0;
+}
+
+.trash {
+  cursor: pointer;
+  color: rgb(218, 29, 29);
+  transition: 0.2s;
+}
+
+.trash:hover {
+  color: rgb(252, 70, 70);
+  scale: 1.1;
+}
+
+img {
+  border-radius: 10px;
+}
+
+.summary {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  transform: translateY(-2.2rem);
+}
+
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+  h3 {
+    margin: 0;
+  }
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  span {
+    font-weight: bold;
+    background-color: var(--blue);
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+  }
+}
+
+button {
+  background: var(--blue);
+  width: 100%;
+  margin-top: 1rem;
+  font-weight: bold;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: var(--blue-dark);
+  color: white;
+}
+.close {
+  margin-left: 95%;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.close:hover {
+  opacity: 1;
+}
+
+.empty-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  h1 {
+    font-size: 2rem;
+    color: var(--blue-dark);
+  }
+}
+</style>

@@ -1,0 +1,37 @@
+:root {
+  --blue: #50cffa;
+  --color-text: #333;
+  --blue-lighter: color-mix(in srgb, var(--blue), white 75%);
+  --blue-light: color-mix(in srgb, var(--blue), white);
+  --blue-dark: #139ad4;
+  --blue-darker: color-mix(in srgb, var(--blue), black);
+}
+
+body {
+  min-height: 100vh;
+  color: var(--color-text);
+  line-height: 1.6;
+  font-family: InterVariable, sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--blue);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #e8e7e7;
+}
