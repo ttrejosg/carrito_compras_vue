@@ -34,6 +34,7 @@ const fetchData = async () => {
       name: product.name,
       price: product.price,
       expiration: product.expiration ? product.expiration : "No EXP",
+      image: product.image,
     }));
   } catch (error) {
     console.log(error);
@@ -70,6 +71,7 @@ fetchData();
           :name="product.name"
           :price="product.price"
           :expiration="product.expiration"
+          :image="product.image"
           @showAlertEmit="showAlert"
         >
         </ProductCard>

@@ -1,14 +1,31 @@
 <script setup>
 import IconClose from "./icons/IconClose.vue";
+import { ref } from "vue";
 
 const props = defineProps({
   title: String,
-  product: Object,
+  product: {
+    type: Object,
+    default: {
+      name: " ",
+      price: 50,
+      expiration: "",
+      id: "",
+      image: " ",
+    },
+  },
   btnText: String,
   method: String,
 });
 
 const emit = defineEmits(["closeModalEmit", "fetchProductEmit"]);
+
+const clearInputs = () => {
+  props.product.name = "";
+  props.product.price = 50;
+  props.product.expiration = "";
+  props.product.image = "";
+};
 
 const createProduct = async () => {
   try {
@@ -17,10 +34,17 @@ const createProduct = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(props.product),
+      body: JSON.stringify({
+        name: props.product.name,
+        price: props.product.price,
+        expiration: props.product.expiration,
+        image: props.product.image,
+      }),
     });
 
     const data = await response.json();
+    clearInputs();
+    emit("fetchProductEmit");
   } catch (error) {
     console.log(error);
   }
@@ -42,18 +66,44 @@ const putProduct = async () => {
     const data = await response.json();
 
     console.log(data);
+    emit("fetchProductEmit");
   } catch (error) {
     console.log(error);
   }
 };
 
 const fetchProduct = async () => {
-  if (props.method === "POST") {
-    await createProduct();
-  } else {
-    await putProduct();
+  const input = document.getElementById("expiration");
+  input.classList.remove("invalidIn");
+
+  if (props.product.expiration) {
+    const expiration = new Date(props.product.expiration);
+    const today = new Date();
+    if (expiration < today) {
+      input.classList.add("invalidIn");
+      return;
+    }
   }
-  emit("fetchProductEmit");
+
+  // Revisar si la url de la imagen  ingresada en el input es válida,
+  // para ello se crea un objeto de tipo Image y se le asigna la url de la imagen
+  // si la imagen no se puede cargar, se agrega una clase al input para indicar que es inválido
+
+  const img = new Image();
+  img.src = props.product.image;
+
+  img.onload = async () => {
+    if (props.method === "POST") {
+      await createProduct();
+    } else {
+      await putProduct();
+    }
+  };
+
+  img.onerror = () => {
+    const input = document.getElementById("image");
+    input.classList.add("invalidIn");
+  };
 };
 </script>
 
@@ -70,6 +120,7 @@ const fetchProduct = async () => {
           v-model="product.name"
           autocomplete="off"
           required
+          pattern="[a-zA-Z\s]+"
         />
         <div class="row">
           <div>
@@ -80,6 +131,7 @@ const fetchProduct = async () => {
               v-model="product.price"
               autocomplete="off"
               required
+              min="50"
             />
           </div>
           <div>
@@ -92,6 +144,14 @@ const fetchProduct = async () => {
             />
           </div>
         </div>
+        <label for="image">Image</label>
+        <input
+          type="text"
+          id="image"
+          v-model="product.image"
+          autocomplete="off"
+          required
+        />
         <button type="submit">{{ btnText }}</button>
       </form>
     </section>
@@ -159,6 +219,12 @@ input {
   margin-bottom: 1rem;
   border-radius: 5px;
   border: 1px solid #ccc;
+  outline: none;
+  transition: 0.2s;
+}
+
+input:invalid {
+  border: 1px solid red;
 }
 
 label {
@@ -167,7 +233,7 @@ label {
 
 .close {
   position: relative;
-  top: -7rem;
+  top: -9.4rem;
   right: 7.2rem;
   cursor: pointer;
   opacity: 0.7;
@@ -175,5 +241,13 @@ label {
 
 .close:hover {
   opacity: 1;
+}
+
+.invalidL {
+  color: red;
+}
+
+.invalidIn {
+  border: 1px solid red;
 }
 </style>

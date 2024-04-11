@@ -1,11 +1,15 @@
 <script setup>
-defineProps({
+const props = defineProps({
   id: Number,
   name: String,
   price: Number,
   expiration: {
     type: String,
     default: "No expiration date",
+  },
+  image: {
+    type: String,
+    default: "/src/assets/image.png",
   },
 });
 
@@ -15,7 +19,7 @@ import IconAdd from "./icons/IconAdd.vue";
 
 const emit = defineEmits(["showAlertEmit"]);
 
-const addToCart = (name, expiration, price) => {
+const addToCart = (name, expiration, price, image) => {
   emit("showAlertEmit");
 
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -23,7 +27,7 @@ const addToCart = (name, expiration, price) => {
   const product = cart.find((product) => product.name === name);
 
   if (product) product.amount += 1;
-  else cart.push({ name, expiration, price, amount: 1 });
+  else cart.push({ name, expiration, price, image, amount: 1 });
 
   localStorage.setItem("cart", JSON.stringify(cart));
 };
@@ -31,7 +35,7 @@ const addToCart = (name, expiration, price) => {
 
 <template>
   <article class="info">
-    <img src="../assets/image.png" alt="" />
+    <img :src="image" alt="" />
     <h2>{{ name }}</h2>
     <div class="info-v">
       <div title="Expiration date">
@@ -42,7 +46,10 @@ const addToCart = (name, expiration, price) => {
         <IconPrice />
         <span>{{ price }}</span>
       </div>
-      <button title="Add to cart" @click="addToCart(name, expiration, price)">
+      <button
+        title="Add to cart"
+        @click="addToCart(name, expiration, price, image)"
+      >
         <IconAdd />
       </button>
     </div>
@@ -65,6 +72,8 @@ article:hover .info-v div {
 img {
   border-radius: 20px;
   width: 100%;
+  height: 15rem;
+  object-fit: cover;
 }
 
 .info {
@@ -91,6 +100,8 @@ h2 {
   margin: 0;
   margin-top: 0.8rem;
   margin-left: 1rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
 }
 
 .info-v {
@@ -105,7 +116,7 @@ h2 {
     gap: 0.3rem;
     border-radius: 10px;
     border: 2px solid #ccc;
-    padding: 0 0.5rem;
+    padding: 0 0.4rem;
     transition: 0.3s;
   }
 }

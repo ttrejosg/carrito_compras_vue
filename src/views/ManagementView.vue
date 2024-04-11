@@ -16,14 +16,14 @@ const btnTextModal = ref("Edit");
 const productModal = ref({ name: "", price: "", expiration: "", id: "" });
 const method = ref("PUT");
 
-const openModalHandler = (name, price, expiration, id, methodE) => {
-  productModal.value = { name, price, expiration, id };
+const openModalHandler = (name, price, expiration, id, image, methodE) => {
   method.value = methodE;
-  console.log(methodE);
   if (methodE === "POST") {
+    productModal.value = undefined;
     titleModal.value = "Add Product";
     btnTextModal.value = "Add new product";
   } else {
+    productModal.value = { name, price, expiration, id, image };
     titleModal.value = "Edit Product";
     btnTextModal.value = "Save changes";
   }
@@ -71,6 +71,7 @@ const fetchData = async () => {
       name: product.name,
       price: product.price,
       expiration: product.expiration ? product.expiration : "No EXP",
+      image: product.image,
     }));
   } catch (error) {
     console.log(error);
@@ -101,7 +102,7 @@ fetchData();
     <h1>Manage Products</h1>
     <div>
       <SearchBar @inputEmit="handleInput" />
-      <button @click="openModalHandler('', '', None, None, 'POST')">
+      <button @click="openModalHandler(None, None, None, None, None, 'POST')">
         <IconAdd />
       </button>
     </div>
@@ -114,6 +115,7 @@ fetchData();
           :name="product.name"
           :price="product.price"
           :expiration="product.expiration"
+          :image="product.image"
           @openModalEmit="openModalHandler"
           @deleteProductEmit="deleteProduct"
         >

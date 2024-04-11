@@ -4,6 +4,10 @@ defineProps({
   name: String,
   price: Number,
   expiration: String,
+  image: {
+    type: String,
+    default: "/src/assets/image.png",
+  },
 });
 
 import IconCalendar from "./icons/IconCalendar.vue";
@@ -16,7 +20,7 @@ const emit = defineEmits(["openModalEmit, deleteProductEmit"]);
 
 <template>
   <article class="info">
-    <img src="../assets/image.png" alt="" />
+    <img :src="image" alt="" />
     <h2>{{ name }}</h2>
     <div class="info-v">
       <div title="Expiration date">
@@ -31,7 +35,9 @@ const emit = defineEmits(["openModalEmit, deleteProductEmit"]);
     <div class="actions">
       <button
         title="Edit product"
-        @click="emit('openModalEmit', name, price, expiration, id, 'PUT')"
+        @click="
+          emit('openModalEmit', name, price, expiration, id, image, 'PUT')
+        "
       >
         <IconEdit />
         <span>Edit</span>
@@ -55,6 +61,8 @@ article {
 img {
   border-radius: 20px;
   width: 100%;
+  height: 15rem;
+  object-fit: cover;
 }
 
 .info {
@@ -81,6 +89,8 @@ h2 {
   margin: 0;
   margin-top: 0.8rem;
   margin-left: 1rem;
+  margin-bottom: 0.4rem;
+  line-height: 1.2;
 }
 
 .info-v {
@@ -94,7 +104,7 @@ h2 {
     gap: 0.3rem;
     border-radius: 10px;
     border: 2px solid #ccc;
-    padding: 0 0.5rem;
+    padding: 0 0.4rem;
     transition: 0.3s;
   }
 }

@@ -56,18 +56,18 @@ const emit = defineEmits(["closeModalEmit", "buyEmit"]);
       <hr />
       <table v-if="products.length > 0">
         <tbody>
-          <tr v-for="(dish, index) in products" :key="index">
+          <tr v-for="(product, index) in products" :key="index">
             <td>
-              <img src="../assets/image.png" alt="Product" width="130" />
+              <img :src="product.image" alt="Product" width="130" />
             </td>
-            <td>{{ dish.name }}</td>
-            <td>EXP: {{ dish.expiration }}</td>
+            <td>{{ product.name }}</td>
+            <td>EXP: {{ product.expiration }}</td>
             <td class="amount">
               <IconMinus @click="subtractPr(index)" />
-              <span> {{ dish.amount }} </span>
+              <span> {{ product.amount }} </span>
               <IconPlus @click="addPr(index)" />
             </td>
-            <td>$ {{ dish.price }}</td>
+            <td>$ {{ product.price }}</td>
             <td>
               <IconTrash class="trash" @click="deletePr(index)" />
             </td>
@@ -106,7 +106,6 @@ const emit = defineEmits(["closeModalEmit", "buyEmit"]);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
   background: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2));
   backdrop-filter: blur(10px);
   gap: 5rem;
@@ -170,14 +169,16 @@ td {
 }
 
 img {
-  border-radius: 10px;
+  border-radius: 20px;
+  width: 100%;
+  height: 8rem;
+  object-fit: cover;
 }
 
 .summary {
   background: white;
   padding: 1rem;
   border-radius: 10px;
-  transform: translateY(-2.2rem);
 }
 
 .summary-list {
