@@ -7,13 +7,14 @@ const props = defineProps({
   product: {
     type: Object,
     default: {
-      name: " ",
+      name: "",
       price: 50,
       expiration: "",
       id: "",
       image: " ",
     },
   },
+  products: Array,
   btnText: String,
   method: String,
 });
@@ -26,6 +27,11 @@ const clearInputs = () => {
   props.product.expiration = "";
   props.product.image = "";
 };
+
+const nameErr = ref("");
+const priceErr = ref("");
+const expirationErr = ref("");
+const imageErr = ref("");
 
 const createProduct = async () => {
   try {
@@ -72,37 +78,69 @@ const putProduct = async () => {
   }
 };
 
+const reset = () => {
+  nameErr.value = "";
+  priceErr.value = "";
+  expirationErr.value = "";
+  imageErr.value = "";
+};
+
 const fetchProduct = async () => {
-  const input = document.getElementById("expiration");
-  input.classList.remove("invalidIn");
+  const inputEx = document.getElementById("expiration");
+  const inputNa = document.getElementById("name");
+  const inputPr = document.getElementById("price");
+  const inputIm = document.getElementById("image");
+  inputEx.classList.remove("invalidIn");
+  inputNa.classList.remove("invalidIn");
+  inputPr.classList.remove("invalidIn");
+  inputIm.classList.remove("invalidIn");
+  reset();
+
+  let invalid = false;
+
+  const product = props.products.find(
+    (product) =>
+      product.name === props.product.name && product.id !== props.product.id
+  );
+
+  if (product) {
+    nameErr.value = "This product already exists";
+    inputNa.classList.add("invalidIn");
+    invalid = true;
+  }
+
+  if (props.product.price < 50) {
+    priceErr.value = "Price must be greater or equal than 50";
+    inputPr.classList.add("invalidIn");
+    invalid = true;
+  }
 
   if (props.product.expiration) {
     const expiration = new Date(props.product.expiration);
     const today = new Date();
     if (expiration < today) {
-      input.classList.add("invalidIn");
-      return;
+      expirationErr.value = "Date must be greater than today";
+      inputEx.classList.add("invalidIn");
+      invalid = true;
     }
   }
-
-  // Revisar si la url de la imagen  ingresada en el input es válida,
-  // para ello se crea un objeto de tipo Image y se le asigna la url de la imagen
-  // si la imagen no se puede cargar, se agrega una clase al input para indicar que es inválido
 
   const img = new Image();
   img.src = props.product.image;
 
   img.onload = async () => {
-    if (props.method === "POST") {
-      await createProduct();
-    } else {
-      await putProduct();
+    if (!invalid) {
+      if (props.method === "POST") {
+        await createProduct();
+      } else {
+        await putProduct();
+      }
     }
   };
 
   img.onerror = () => {
-    const input = document.getElementById("image");
-    input.classList.add("invalidIn");
+    imageErr.value = "Invalid image";
+    inputIm.classList.add("invalidIn");
   };
 };
 </script>
@@ -113,29 +151,34 @@ const fetchProduct = async () => {
       <h2>{{ title }}</h2>
       <hr />
       <form v-on:submit.prevent="fetchProduct">
-        <label for="name">Name</label>
+        <label for="name" v-if="nameErr === ''">Name</label>
+        <label for="name" v-else class="invalidL">{{ nameErr }}</label>
         <input
           type="text"
           id="name"
           v-model="product.name"
           autocomplete="off"
           required
-          pattern="[a-zA-Z\s]+"
         />
         <div class="row">
           <div>
-            <label for="price">Price</label>
+            <label for="price" v-if="priceErr === ''">Price</label>
+            <label for="price" v-else class="invalidL">{{ priceErr }}</label>
             <input
               type="number"
               id="price"
               v-model="product.price"
               autocomplete="off"
               required
-              min="50"
             />
           </div>
           <div>
-            <label for="expiration">Expiration</label>
+            <label for="expiration" v-if="expirationErr === ''"
+              >Expiration</label
+            >
+            <label for="expiration" v-else class="invalidL">{{
+              expirationErr
+            }}</label>
             <input
               type="date"
               id="expiration"
@@ -144,7 +187,8 @@ const fetchProduct = async () => {
             />
           </div>
         </div>
-        <label for="image">Image</label>
+        <label for="image" v-if="imageErr === ''">Image</label>
+        <label for="image" v-else class="invalidL">{{ imageErr }}</label>
         <input
           type="text"
           id="image"
@@ -221,10 +265,6 @@ input {
   border: 1px solid #ccc;
   outline: none;
   transition: 0.2s;
-}
-
-input:invalid {
-  border: 1px solid red;
 }
 
 label {

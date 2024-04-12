@@ -132,6 +132,7 @@ fetchData();
         :product="productModal"
         :btnText="btnTextModal"
         :method="method"
+        :products="products"
         @closeModalEmit="openModalHandler"
         @fetchProductEmit="fetchHandler"
       >
